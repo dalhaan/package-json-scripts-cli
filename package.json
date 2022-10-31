@@ -1,5 +1,6 @@
 {
-  "name": "node-starter",
+  "name": "package-json-scripts-cli",
+  "private": true,
   "type": "module",
   "version": "0.0.0",
   "scripts": {
