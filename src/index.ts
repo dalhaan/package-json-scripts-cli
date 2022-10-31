@@ -43,7 +43,7 @@ inquirer
     },
   ])
   .then(({ script }: { script: string }) => {
-    // Spawn child process to execute script
+    // Spawn child process to execute script: <yarn | npm> run <script>
     spawn(packageManager, ['run', script], {
       // Binds:
       //   - the current process stdin to the child process stdin (for interactivity if the child process requires user input)
