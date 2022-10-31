@@ -1,6 +1,6 @@
 #! /usr/bin/env node
 
-import { readFileSync } from 'fs';
+import { readFileSync, existsSync } from 'fs';
 import { spawn } from 'child_process';
 import type { IPackageJson } from 'package-json-type';
 import inquirer from 'inquirer';
@@ -15,13 +15,16 @@ const scriptsObj = packageJson.scripts;
 
 if (!scriptsObj) {
   console.log('No scripts found.');
-  process.exit();
+  process.exit(1); // Exit process with error
 }
+
+// Check what package manager the user is using
+const packageManager = existsSync('./yarn.lock') ? 'yarn' : 'npm';
 
 // Get scripts
 const scripts = Object.keys(scriptsObj);
 
-// CLI prompts
+// Prompt user
 inquirer
   .prompt([
     {
@@ -41,7 +44,7 @@ inquirer
   ])
   .then(({ script }: { script: string }) => {
     // Spawn child process to execute script
-    spawn('yarn', ['run', script], {
+    spawn(packageManager, ['run', script], {
       // Binds:
       //   - the current process stdin to the child process stdin (for interactivity if the child process requires user input)
       //   - the child process stdout to the current process stdout (to stream the output of the script)
