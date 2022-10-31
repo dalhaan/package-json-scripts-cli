@@ -9,6 +9,7 @@ export default {
   plugins: [
     esbuild({
       platform: 'node',
+      minify: true,
       // optimizeDeps: {
       //   include: ['inquirer', 'inquirer-autocomplete-prompt'],
       // },

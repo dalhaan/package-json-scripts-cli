@@ -8,6 +8,10 @@
     "start": "node ./output/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "peerDependencies": {
+    "inquirer": "^9.1.4",
+    "inquirer-autocomplete-prompt": "^3.0.0"
+  },
   "devDependencies": {
     "@rollup/plugin-typescript": "^9.0.2",
     "@types/inquirer": "^9.0.2",
@@ -22,8 +26,6 @@
     "typescript": "^4.8.4"
   },
   "dependencies": {
-    "chalk": "^5.1.2",
-    "commander": "^9.4.1",
     "inquirer": "^9.1.4",
     "inquirer-autocomplete-prompt": "^3.0.0"
   }
