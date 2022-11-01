@@ -5,6 +5,7 @@ import { spawn } from 'child_process';
 import type { IPackageJson } from 'package-json-type';
 import inquirer from 'inquirer';
 import inquirerPrompt from 'inquirer-autocomplete-prompt';
+import { filter as fuzzyFilter } from 'fuzzy';
 
 inquirer.registerPrompt('autocomplete', inquirerPrompt);
 
@@ -38,7 +39,7 @@ inquirer
           if (!input) {
             return resolve(scripts);
           }
-          resolve(scripts.filter((s) => s.startsWith(input)));
+          resolve(fuzzyFilter(input, scripts).map((el) => el.original));
         }),
     },
   ])

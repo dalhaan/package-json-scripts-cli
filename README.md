@@ -23,3 +23,11 @@ yarn start
 **Autocompletion:**
 
 <img src="docs/images/autocomplete.png" width="380" />
+
+## Tech
+
+- [NodeJS](https://nodejs.org/) - runtime
+- [inquirer](https://github.com/SBoudrias/Inquirer.js) - CLI prompts
+- [inquirer-autocomplete-prompt](https://github.com/mokkabonna/inquirer-autocomplete-prompt) - autocomplete list
+- [fuzzy](https://github.com/mattyork/fuzzy) - fuzzy string search
+- [rollup](https://rollupjs.org/) - bundler
