@@ -5,6 +5,7 @@ CLI tool for easily finding and running scripts in the `package.json` of the cur
 ## Build
 
 ```bash
+nvm use
 yarn install
 yarn build
 # Creates: output/index.js
