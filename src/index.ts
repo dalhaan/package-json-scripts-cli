@@ -9,6 +9,10 @@ import { filter as fuzzyFilter } from 'fuzzy';
 
 inquirer.registerPrompt('autocomplete', inquirerPrompt);
 
+type PackageManager = 'yarn' | 'npm';
+
+const PACKAGE_MANAGERS: PackageManager[] = ['yarn', 'npm'];
+
 // Get scripts object from package.json
 const rawJson = readFileSync('./package.json', 'utf8');
 const packageJson: IPackageJson = JSON.parse(rawJson);
@@ -20,36 +24,69 @@ if (!scriptsObj) {
 }
 
 // Check what package manager the user is using
-const packageManager = existsSync('./yarn.lock') ? 'yarn' : 'npm';
+let packageManagerDetected: PackageManager | null = null;
+
+if (existsSync('./yarn.lock')) {
+  packageManagerDetected = 'yarn';
+} else if (existsSync('./package-lock.json')) {
+  packageManagerDetected = 'npm';
+}
+
+// const packageManager = 'yarn';
 
 // Get scripts
 const scripts = Object.keys(scriptsObj);
+
+const fuzzySearch =
+  (choices: string[]) => (answersSoFar: never, input?: string) =>
+    // Seach scripts for input
+    new Promise((resolve) => {
+      if (!input) {
+        return resolve(choices);
+      }
+      resolve(fuzzyFilter(input, choices).map((el) => el.original));
+    });
 
 // Prompt user
 inquirer
   .prompt([
     {
       type: 'autocomplete',
+      name: 'packageManagerChoice',
+      message: 'Package manager not detected. Which would you like to use?',
+      choices: PACKAGE_MANAGERS,
+      source: fuzzySearch(PACKAGE_MANAGERS),
+      when: packageManagerDetected === null,
+    },
+    {
+      type: 'autocomplete',
       name: 'script',
       message: 'Select script to run:',
       choices: scripts,
-      source: (answersSoFar: never, input?: string) =>
-        // Seach scripts for input
-        new Promise((resolve) => {
-          if (!input) {
-            return resolve(scripts);
-          }
-          resolve(fuzzyFilter(input, scripts).map((el) => el.original));
-        }),
+      source: fuzzySearch(scripts),
     },
   ])
-  .then(({ script }: { script: string }) => {
-    // Spawn child process to execute script: <yarn | npm> run <script>
-    spawn(packageManager, ['run', script], {
-      // Binds:
-      //   - the current process stdin to the child process stdin (for interactivity if the child process requires user input)
-      //   - the child process stdout to the current process stdout (to stream the output of the script)
-      //   - the child process stderr to the current process stderr (to stream the errors of the script)
-      stdio: [process.stdin, process.stdout, process.stderr],
-    });
-  });
+  .then(
+    ({
+      packageManagerChoice,
+      script,
+    }: {
+      packageManagerChoice?: PackageManager;
+      script: string;
+    }) => {
+      const packageManager = packageManagerChoice || packageManagerDetected;
+
+      console.log(`Using ${packageManager}...`);
+
+      if (packageManager) {
+        // Spawn child process to execute script: <yarn | npm> run <script>
+        spawn(packageManager, ['run', script], {
+          // Binds:
+          //   - the current process stdin to the child process stdin (for interactivity if the child process requires user input)
+          //   - the child process stdout to the current process stdout (to stream the output of the script)
+          //   - the child process stderr to the current process stderr (to stream the errors of the script)
+          stdio: [process.stdin, process.stdout, process.stderr],
+        });
+      }
+    }
+  );
