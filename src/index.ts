@@ -22,28 +22,29 @@ if (!scriptsObj) {
   process.exit(1); // Exit process with error
 }
 
-// Check what package manager the user is using
 let packageManagerDetected: PackageManager | null = null;
 
+// Check what package manager the user is using
 if (existsSync('./yarn.lock')) {
   packageManagerDetected = 'yarn';
 } else if (existsSync('./package-lock.json')) {
   packageManagerDetected = 'npm';
 }
 
-// const packageManager = 'yarn';
-
 // Get scripts
 const scripts = Object.keys(scriptsObj);
 
+// Fuzzy search function for inquirer
 const fuzzySearch =
   (choices: string[]) => (answersSoFar: never, input?: string) =>
-    // Seach scripts for input
     new Promise((resolve) => {
+      // If no input, return all choices
       if (!input) {
-        return resolve(choices);
+        resolve(choices);
+      } else {
+        // Otherwise, fuzzy search the choices.
+        resolve(fuzzyFilter(input, choices).map((el) => el.original));
       }
-      resolve(fuzzyFilter(input, choices).map((el) => el.original));
     });
 
 // Prompt user
