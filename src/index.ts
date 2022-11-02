@@ -1,11 +1,10 @@
-#! /usr/bin/env node
-
 import { readFileSync, existsSync } from 'fs';
 import { spawn } from 'child_process';
 import type { IPackageJson } from 'package-json-type';
 import inquirer from 'inquirer';
 import inquirerPrompt from 'inquirer-autocomplete-prompt';
 import { filter as fuzzyFilter } from 'fuzzy';
+import chalk from 'chalk';
 
 inquirer.registerPrompt('autocomplete', inquirerPrompt);
 
@@ -76,7 +75,8 @@ inquirer
     }) => {
       const packageManager = packageManagerChoice || packageManagerDetected;
 
-      console.log(`Using ${packageManager}...`);
+      // Log command that is being run
+      console.log(chalk.blueBright.bold(`${packageManager} run ${script}`));
 
       if (packageManager) {
         // Spawn child process to execute script: <yarn | npm> run <script>
@@ -87,6 +87,12 @@ inquirer
           //   - the child process stderr to the current process stderr (to stream the errors of the script)
           stdio: [process.stdin, process.stdout, process.stderr],
         });
+      } else {
+        // Shouldn't be able to get here but just in case something goes terribly wrong.
+        console.error(
+          'Something went wrong: Package manager not detected or specified.'
+        );
+        process.exit(1);
       }
     }
   );
